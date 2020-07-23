@@ -36,12 +36,18 @@ static struct {
     jfieldID sizeCopied;
 } gCharArrayBufferClassInfo;
 
+static jstring gEmptyString = NULL;
+
 static void throwExceptionWithRowCol(JNIEnv* env, jint row, jint column) {
-    jniThrowException(env, "java/lang/IllegalStateException", "Couldn't read row");
+    char buf[64];
+    snprintf(buf, sizeof(buf), "Couldn't read row %d column %d", row, column);
+    jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
 static void throwUnknownTypeException(JNIEnv * env, jint type) {
-    jniThrowException(env, "java/lang/IllegalStateException", "UNKNOWN type");
+    char buf[32];
+    snprintf(buf, sizeof(buf), "UNKNOWN type %d", type);
+    jniThrowException(env, "java/lang/IllegalStateException", buf);
 }
 
 static jlong nativeCreate(JNIEnv* env, jclass clazz, jstring nameObj, jint cursorWindowSize) {
@@ -171,11 +177,20 @@ static jstring nativeGetString(JNIEnv* env, jclass clazz, jlong windowPtr,
         size_t sizeIncludingNull;
         const char* value = window->getFieldSlotValueString(fieldSlot, &sizeIncludingNull);
         if (sizeIncludingNull <= 1) {
-            return NULL;
+            return gEmptyString;
         }
-        jchar chars[sizeIncludingNull - 1];
-        jint size = utf8ToJavaCharArray(value, chars, sizeIncludingNull - 1);
-        return env->NewString(chars, size);
+        const size_t MaxStackStringSize = 65536; // max size for a stack char array
+        if (sizeIncludingNull > MaxStackStringSize) {
+            jchar* chars = new jchar[sizeIncludingNull - 1];
+            jint size = utf8ToJavaCharArray(value, chars, sizeIncludingNull - 1);
+            jstring string = env->NewString(chars, size);
+            delete[] chars;
+            return string;
+        } else {
+            jchar chars[sizeIncludingNull - 1];
+            jint size = utf8ToJavaCharArray(value, chars, sizeIncludingNull - 1);
+            return env->NewString(chars, size);
+        }
     } else if (type == CursorWindow::FIELD_TYPE_INTEGER) {
         int64_t value = window->getFieldSlotValueLong(fieldSlot);
         char buf[32];
@@ -390,6 +405,7 @@ int register_android_database_CursorWindow(JNIEnv* env)
     GET_FIELD_ID(gCharArrayBufferClassInfo.data, clazz, "data", "[C");
     GET_FIELD_ID(gCharArrayBufferClassInfo.sizeCopied, clazz, "sizeCopied", "I");
 
+    gEmptyString = static_cast<jstring>(env->NewGlobalRef(env->NewStringUTF("")));
     return jniRegisterNativeMethods(env,
     "org/spatialite/CursorWindow", sMethods, NELEM(sMethods));
 }

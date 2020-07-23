@@ -1,6 +1,6 @@
 [![Release](https://jitpack.io/v/com.github.sevar83/android-spatialite.svg)](https://jitpack.io/v/com.github.sevar83/android-spatialite.svg)
 
-# android-spatialite
+# android-spatialite 
 
 ## WHAT IS THIS?
 - The [Spatialite](https://www.gaia-gis.it/gaia-sins/) database ported for *Android*
@@ -28,7 +28,7 @@ allprojects {
 
 2) Add the following to your module's `build.gradle`:
 ```
-compile 'com.github.sevar83:android-spatialite:2.0.0'
+implementation 'com.github.sevar83:android-spatialite:<LATEST_VERSION>'
 ```
 
 ## EXAMPLE CODE
@@ -84,7 +84,7 @@ android {
 - freexl 1.0.2
 
 ## REQUIREMENTS
-Min SDK 15
+Min SDK 16
 
 ## MIGRATION TO 2.0+
 
@@ -93,6 +93,10 @@ Min SDK 15
 3. Replace all occasions of `import org.spatialite.database.SQLite***Exception;` with `import android.database.sqlite.SQLite***Exception;`
 
 ## CHANGES
+
+### 2.0.1
+- Migrated to AndroidX
+- Fixed native crash [#4](https://github.com/sevar83/android-spatialite/issues/4)
 
 ### 2.0.0
 - Now using the [Requery.io SQLite wrapper](https://github.com/requery/sqlite-android/) instead of SQLCipher's. This results to:
@@ -114,6 +118,12 @@ The main ideas used here were borrowed from:
 - https://github.com/requery/sqlite-android
 - https://github.com/sqlcipher/android-database-sqlcipher
 - https://github.com/illarionov/android-sqlcipher-spatialite
+
+## SUPPORT
+
+If you like this library, please consider...
+
+<a href="https://www.buymeacoffee.com/5Gds924" target="_blank"><img src="https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png" alt="Buy Me A Coffee" style="height: 41px !important;width: 174px !important;box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;-webkit-box-shadow: 0px 3px 2px 0px rgba(190, 190, 190, 0.5) !important;" ></a>
 
 ## KNOWN PROJECTS USING THIS LIBRARY
 
